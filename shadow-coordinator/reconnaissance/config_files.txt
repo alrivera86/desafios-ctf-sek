@@ -1,0 +1,13 @@
+configuration.yaml
+secrets.yaml
+known_devices.yaml
+zigbee.db
+.storage/core.config_entries
+.storage/auth
+automations.yaml
+scripts.yaml
+coordinator_config.json
+mesh_topology.json
+internal_flag.txt
+shadow_coordinator.conf
+.env

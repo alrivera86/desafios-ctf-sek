@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#03a9f4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Home Assistant</title>
+    <link rel="icon" type="image/svg+xml" href="/static/icons/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="ha-theme-dark">
+
+<!-- ============================== LOGIN ============================== -->
+<section class="login-screen" id="loginScreen">
+    <div class="ha-logo-big" aria-hidden="true">
+        <svg viewBox="0 0 240 240"><path fill="#03a9f4" d="M120 16 L216 104 L216 224 L152 224 L152 160 L88 160 L88 224 L24 224 L24 104 Z"/></svg>
+    </div>
+    <form id="loginForm" class="ha-login-card" autocomplete="off">
+        <h1>Home Assistant</h1>
+        <p class="sub">Smart Campus Gateway <span class="pill">ZB-GW-03</span></p>
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" required autofocus>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <label class="check">
+            <input type="checkbox" id="keepLoggedIn" checked>
+            <span>Keep me logged in</span>
+        </label>
+        <button type="submit" class="ha-primary-btn">Log in</button>
+        <span id="loginError" class="login-error" role="alert"></span>
+        <footer>
+            <span>Home Assistant Core 2026.4.1</span>
+            <span>·</span>
+            <span>smart-campus.local</span>
+        </footer>
+        <p class="hint muted">Default accounts: <code>admin / admin1234</code> (owner) or <code>operator / operator123</code> (user)</p>
+    </form>
+</section>
+
+<!-- ============================== MAIN APP ============================== -->
+<div class="ha-app hidden" id="appShell">
+    <!-- Sidebar -->
+    <aside class="ha-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="ha-logo-small" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3 22 12v9h-6v-7h-8v7H2v-9z"/></svg>
+            </div>
+            <div class="sidebar-title">
+                <strong>Home Assistant</strong>
+                <small id="hostName">smart-campus.local</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Main navigation">
+            <button class="nav-item active" data-view="overview" title="Overview">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Overview</span>
+            </button>
+            <button class="nav-item" data-view="energy" title="Energy">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+                <span>Energy</span>
+            </button>
+            <button class="nav-item" data-view="map" title="Map">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M15 19l-6-2.11V5l6 2.11zM20.5 3c-.16 0-.31.03-.47.09L15 5 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5.06 0 .11-.01.16-.02L9 19l6 2 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5z"/></svg>
+                <span>Map</span>
+            </button>
+            <button class="nav-item" data-view="logbook" title="Logbook">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19z"/></svg>
+                <span>Logbook</span>
+            </button>
+            <button class="nav-item" data-view="history" title="History">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M13.5 8H12v5l4.28 2.54.72-1.21-3.5-2.08zM13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+                <span>History</span>
+            </button>
+            <button class="nav-item" data-view="zigbee" title="Zigbee">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M12 2 2 7v10l10 5 10-5V7zm0 2.3 7 3.5-7 3.5-7-3.5zM4 9.6 11 13v7.4L4 16.9zm9 10.8V13l7-3.5v7.4z"/></svg>
+                <span>Zigbee</span>
+            </button>
+            <button class="nav-item" data-view="developer" title="Developer tools">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6z"/></svg>
+                <span>Developer tools</span>
+            </button>
+            <div class="nav-divider"></div>
+            <button class="nav-item" data-view="settings" title="Settings">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M19.14 12.94a7.14 7.14 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.14.56-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.14 7.14 0 0 0 0 1.88L2.83 14.52a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .61.22l2.39-.96c.48.38 1.03.7 1.62.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54c.59-.24 1.14-.56 1.62-.94l2.39.96a.5.5 0 0 0 .61-.22l1.92-3.32a.5.5 0 0 0-.12-.64zM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5z"/></svg>
+                <span>Settings</span>
+                <span class="badge" id="settingsBadge">1</span>
+            </button>
+            <button class="nav-item" data-view="notifications" title="Notifications">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 1 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1z"/></svg>
+                <span>Notifications</span>
+                <span class="dot" id="notifDot"></span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="profile-btn" id="profileBtn" type="button">
+                <span class="avatar-circle" id="avatarLetter">A</span>
+                <div>
+                    <strong id="profileName">Admin</strong>
+                    <small><span id="roleBadge" class="role-pill role-owner">owner</span> · local</small>
+                </div>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main workspace -->
+    <section class="ha-workspace">
+        <!-- App bar -->
+        <header class="ha-appbar">
+            <button class="icon-btn" id="toggleSidebar" type="button" aria-label="Toggle menu">
+                <svg class="mdi" viewBox="0 0 24 24"><path d="M3 18h18v-2H3zm0-5h18v-2H3zm0-7v2h18V6z"/></svg>
+            </button>
+            <h1 id="viewTitle">Overview</h1>
+            <div class="appbar-tabs" id="appbarTabs">
+                <button class="tab active" data-tab="home" type="button">Home</button>
+                <button class="tab" data-tab="security" type="button">Security</button>
+                <button class="tab" data-tab="network" type="button">Network</button>
+            </div>
+            <div class="appbar-actions">
+                <span class="conn-indicator" id="connIndicator" title="WebSocket">
+                    <span class="conn-dot"></span>
+                    <span class="conn-text">Connecting…</span>
+                </span>
+                <button class="icon-btn" type="button" id="searchBtn" aria-label="Search">
+                    <svg class="mdi" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.51 4.51 0 0 1 9.5 14z"/></svg>
+                </button>
+                <button class="icon-btn" type="button" id="notifBtn" aria-label="Notifications">
+                    <svg class="mdi" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 1 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1z"/></svg>
+                    <span class="badge-dot" id="notifBadge"></span>
+                </button>
+                <button class="icon-btn" type="button" id="moreBtn" aria-label="More">
+                    <svg class="mdi" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="ha-content">
+
+            <!-- ================== OVERVIEW ================== -->
+            <section class="ha-view active" id="view-overview">
+
+                <!-- ---- Home dashboard ---- -->
+                <div class="lovelace-grid dashboard-panel active" data-dashboard="home" id="lovelaceGrid">
+                    <!-- North Hall tile -->
+                    <article class="hui-card area-card" data-area="north_hall">
+                        <header><h2>North Hall</h2><span class="state-chip state-ok">3 entities</span></header>
+                        <div class="entity-tile">
+                            <div class="tile-icon temperature"><svg class="mdi" viewBox="0 0 24 24"><path d="M15 13V5a3 3 0 0 0-6 0v8a5 5 0 1 0 6 0z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="sensor.north_hall_temperature">—</strong><small>North Hall Temperature</small></div>
+                        </div>
+                        <div class="entity-tile">
+                            <div class="tile-icon motion"><svg class="mdi" viewBox="0 0 24 24"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9 1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="binary_sensor.north_hall_motion">—</strong><small>North Hall Motion</small></div>
+                        </div>
+                        <div class="entity-tile">
+                            <div class="tile-icon signal"><svg class="mdi" viewBox="0 0 24 24"><path d="M2 22h20v-4H2zm4-6h12v-3H6zm4-5h4V8h-4zM8 4v2h8V4z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="sensor.north_hall_linkquality">—</strong><small>Link quality (LQI)</small></div>
+                        </div>
+                    </article>
+
+                    <!-- Main Entrance -->
+                    <article class="hui-card area-card" data-area="main_entrance">
+                        <header><h2>Main Entrance</h2><span class="state-chip state-warn">attention</span></header>
+                        <div class="entity-tile">
+                            <div class="tile-icon lock"><svg class="mdi" viewBox="0 0 24 24"><path d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zM9 6a3 3 0 0 1 6 0v2H9zm3 10a2 2 0 1 1 2-2 2 2 0 0 1-2 2z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="lock.main_door_smart_lock">—</strong><small>Main Door Smart Lock</small></div>
+                        </div>
+                        <div class="entity-tile">
+                            <div class="tile-icon battery"><svg class="mdi" viewBox="0 0 24 24"><path d="M16.67 4H15V2h-6v2H7.33A1.33 1.33 0 0 0 6 5.33v15.34A1.33 1.33 0 0 0 7.33 22h9.34A1.33 1.33 0 0 0 18 20.67V5.33A1.33 1.33 0 0 0 16.67 4z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="sensor.main_door_battery">—</strong><small>Battery</small></div>
+                        </div>
+                        <div class="entity-tile">
+                            <div class="tile-icon zigbee"><svg class="mdi" viewBox="0 0 24 24"><path d="M12 2 2 7v10l10 5 10-5V7zm0 2.3 7 3.5-7 3.5-7-3.5z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="sensor.main_door_nwk_address">0x7B9C</strong><small>Zigbee address</small></div>
+                        </div>
+                    </article>
+
+                    <!-- Library -->
+                    <article class="hui-card area-card" data-area="library">
+                        <header><h2>Library</h2><span class="state-chip state-ok">online</span></header>
+                        <div class="entity-tile">
+                            <div class="tile-icon motion"><svg class="mdi" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="binary_sensor.library_occupancy">—</strong><small>Library Occupancy</small></div>
+                        </div>
+                        <div class="entity-tile">
+                            <div class="tile-icon battery"><svg class="mdi" viewBox="0 0 24 24"><path d="M16.67 4H15V2h-6v2H7.33A1.33 1.33 0 0 0 6 5.33v15.34A1.33 1.33 0 0 0 7.33 22h9.34A1.33 1.33 0 0 0 18 20.67V5.33A1.33 1.33 0 0 0 16.67 4z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="sensor.library_motion_battery">—</strong><small>Battery</small></div>
+                        </div>
+                    </article>
+
+                    <!-- Atrium -->
+                    <article class="hui-card area-card" data-area="atrium">
+                        <header><h2>Atrium</h2><span class="state-chip state-ok">router</span></header>
+                        <div class="entity-tile">
+                            <div class="tile-icon router"><svg class="mdi" viewBox="0 0 24 24"><path d="M20.2 5.9l.8-.8C19.58 3.7 17.85 3 16 3s-3.58.7-5 2.1l.8.8a6.66 6.66 0 0 1 8.4 0zm-1.6 1.6a4.97 4.97 0 0 0-7.2 0l-.8-.8a6.52 6.52 0 0 1 8.8 0zM8 12h12v10H4V12h2v-2H2v14h20V10h-4v2h-2V9h-2z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="device_tracker.atrium_relay">—</strong><small>Atrium Relay</small></div>
+                        </div>
+                        <div class="entity-tile">
+                            <div class="tile-icon signal"><svg class="mdi" viewBox="0 0 24 24"><path d="M2 22h20v-4H2zm4-6h12v-3H6zm4-5h4V8h-4z"/></svg></div>
+                            <div class="tile-meta"><strong data-entity="sensor.atrium_relay_lqi">—</strong><small>Link quality</small></div>
+                        </div>
+                    </article>
+
+                    <!-- Zigbee live card (spans 2 cols) -->
+                    <article class="hui-card wide-card">
+                        <header>
+                            <h2>Zigbee network</h2>
+                            <span class="state-chip state-ok" id="zigbeeNetworkStatus">—</span>
+                        </header>
+                        <div class="entity-list" id="entityList"></div>
+                    </article>
+
+                    <!-- Recent activity -->
+                    <article class="hui-card wide-card">
+                        <header>
+                            <h2>Recent activity</h2>
+                            <small class="muted" id="activityTs">—</small>
+                        </header>
+                        <div class="activity-list" id="activityList"></div>
+                    </article>
+                </div>
+
+                <!-- ---- Security dashboard ---- -->
+                <div class="lovelace-grid dashboard-panel" data-dashboard="security">
+                    <article class="hui-card wide-card">
+                        <header>
+                            <h2>Security posture</h2>
+                            <span class="state-chip" id="securityPosture">—</span>
+                        </header>
+                        <div class="sec-posture" id="secPosture"></div>
+                    </article>
+
+                    <article class="hui-card">
+                        <header><h2>Perimeter locks</h2><small class="muted">Control access</small></header>
+                        <div class="entity-list" id="secLocksList"></div>
+                    </article>
+
+                    <article class="hui-card">
+                        <header><h2>Motion &amp; occupancy</h2><small class="muted">Last triggered</small></header>
+                        <div class="entity-list" id="secMotionList"></div>
+                    </article>
+
+                    <article class="hui-card wide-card">
+                        <header><h2>Security events</h2><small class="muted">Filtered audit log</small></header>
+                        <div class="activity-list" id="secEventsList"></div>
+                    </article>
+
+                    <article class="hui-card">
+                        <header><h2>Alarm panel</h2></header>
+                        <div class="alarm-panel">
+                            <div class="alarm-mode" id="alarmMode">DISARMED</div>
+                            <div class="button-row">
+                                <button class="ha-btn" data-alarm="arm_home" type="button">Arm home</button>
+                                <button class="ha-btn" data-alarm="arm_away" type="button">Arm away</button>
+                                <button class="ha-btn ghost" data-alarm="disarm" type="button">Disarm</button>
+                            </div>
+                            <p class="muted" id="alarmHint">Campus operators can arm the alarm remotely.</p>
+                        </div>
+                    </article>
+
+                    <article class="hui-card">
+                        <header><h2>People</h2><small class="muted">Tracked devices</small></header>
+                        <div class="entity-list" id="secPeopleList"></div>
+                    </article>
+                </div>
+
+                <!-- ---- Network dashboard ---- -->
+                <div class="lovelace-grid dashboard-panel" data-dashboard="network">
+                    <article class="hui-card">
+                        <header><h2>Zigbee coordinator</h2></header>
+                        <div class="kv-list" id="netCoordInfo"></div>
+                    </article>
+
+                    <article class="hui-card">
+                        <header><h2>Mesh health</h2></header>
+                        <div class="mesh-health" id="meshHealth"></div>
+                    </article>
+
+                    <article class="hui-card">
+                        <header><h2>Packet rate</h2><small class="muted" id="netPacketRateLabel">— pps</small></header>
+                        <div id="netPacketChart" class="chart-host" style="height:160px"></div>
+                    </article>
+
+                    <article class="hui-card wide-card">
+                        <header><h2>Router nodes</h2><small class="muted">Role, LQI and battery</small></header>
+                        <div class="net-devices-grid" id="netDevicesGrid"></div>
+                    </article>
+
+                    <article class="hui-card wide-card">
+                        <header>
+                            <h2>Live mesh</h2>
+                            <small class="muted">Click a node for details</small>
+                        </header>
+                        <div class="map-container" style="height:340px;min-height:0">
+                            <svg class="mesh-map" id="netMeshMap" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet"></svg>
+                            <aside class="map-side" id="netNodeDetail"><p class="muted">Click a node to see details</p></aside>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- ================== ENERGY ================== -->
+            <section class="ha-view" id="view-energy">
+                <div class="lovelace-grid">
+                    <article class="hui-card wide-card">
+                        <header><h2>Grid consumption</h2><small class="muted">Last 7 days · kWh</small></header>
+                        <div id="energyChart" class="chart-host"></div>
+                    </article>
+                    <article class="hui-card">
+                        <header><h2>Today summary</h2></header>
+                        <div class="energy-summary" id="energySummary"></div>
+                    </article>
+                    <article class="hui-card">
+                        <header><h2>Devices</h2></header>
+                        <div class="energy-devices" id="energyDevices"></div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- ================== MAP ================== -->
+            <section class="ha-view" id="view-map">
+                <article class="hui-card full-card">
+                    <header>
+                        <h2>Campus map</h2>
+                        <small class="muted">Zigbee mesh topology · channel 15</small>
+                    </header>
+                    <div class="map-container">
+                        <svg class="mesh-map" id="meshMap" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" aria-label="Zigbee mesh topology"></svg>
+                        <aside class="map-side" id="mapNodeDetail">
+                            <p class="muted">Click a node to see details</p>
+                        </aside>
+                    </div>
+                </article>
+            </section>
+
+            <!-- ================== LOGBOOK ================== -->
+            <section class="ha-view" id="view-logbook">
+                <article class="hui-card full-card">
+                    <header>
+                        <h2>Logbook</h2>
+                        <small class="muted">Live event stream</small>
+                    </header>
+                    <div class="activity-list big" id="logbookList"></div>
+                </article>
+            </section>
+
+            <!-- ================== HISTORY ================== -->
+            <section class="ha-view" id="view-history">
+                <div class="lovelace-grid">
+                    <article class="hui-card wide-card">
+                        <header>
+                            <h2>Temperature · North Hall</h2>
+                            <small class="muted">Last 24 hours</small>
+                        </header>
+                        <div id="historyTempChart" class="chart-host"></div>
+                    </article>
+                    <article class="hui-card wide-card">
+                        <header>
+                            <h2>Link quality · mesh average</h2>
+                            <small class="muted">Last 24 hours · LQI 0–255</small>
+                        </header>
+                        <div id="historyLqiChart" class="chart-host"></div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- ================== ZIGBEE ================== -->
+            <section class="ha-view" id="view-zigbee">
+                <div class="lovelace-grid">
+                    <article class="hui-card wide-card">
+                        <header>
+                            <h2>Mesh console</h2>
+                            <div class="inline-actions">
+                                <span class="state-chip" id="zigbeePacketRate">0 pps</span>
+                                <button class="ha-btn ghost" id="zigbeePause" type="button">Pause</button>
+                                <button class="ha-btn ghost" id="zigbeeClear" type="button">Clear</button>
+                            </div>
+                        </header>
+                        <div class="zigbee-console" id="zigbeeConsole" role="log" aria-live="polite"></div>
+                    </article>
+                    <article class="hui-card">
+                        <header><h2>Coordinator</h2></header>
+                        <div class="kv-list" id="coordinatorInfo"></div>
+                    </article>
+                    <article class="hui-card">
+                        <header><h2>Diagnostics</h2></header>
+                        <p class="muted">Rolling packet capture in IEEE 802.15.4 pcap format.</p>
+                        <div class="button-row">
+                            <a class="ha-btn" href="/diagnostics/capture.pcap" download>Download capture.pcap</a>
+                            <button class="ha-btn ghost" id="regenCapture" type="button">Regenerate</button>
+                        </div>
+                        <pre id="captureMeta" class="mono">capture.pcap · pending…</pre>
+                    </article>
+                </div>
+            </section>
+
+            <!-- ================== DEVELOPER TOOLS ================== -->
+            <section class="ha-view" id="view-developer">
+                <div class="lovelace-grid">
+                    <article class="hui-card wide-card">
+                        <header><h2>States</h2><small class="muted">Live entity registry</small></header>
+                        <div class="dev-state-table" id="devStateTable"></div>
+                    </article>
+                    <article class="hui-card">
+                        <header><h2>Services</h2></header>
+                        <form class="dev-form" id="devServiceForm">
+                            <label>Service</label>
+                            <input type="text" value="lock.unlock" name="service" list="devServiceList" placeholder="domain.service">
+                            <datalist id="devServiceList"></datalist>
+                            <label>Data (YAML)</label>
+                            <textarea name="data" rows="4">entity_id: lock.main_door_smart_lock</textarea>
+                            <button class="ha-primary-btn" type="submit">Call service</button>
+                        </form>
+                        <pre id="devServiceResult" class="mono muted">No service called yet</pre>
+                    </article>
+                </div>
+            </section>
+
+            <!-- ================== SETTINGS ================== -->
+            <section class="ha-view" id="view-settings">
+                <div class="settings-layout">
+                    <aside class="settings-menu">
+                        <button class="selected" data-settings="devices" type="button">
+                            <svg class="mdi" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+                            Devices &amp; services
+                        </button>
+                        <button data-settings="automations" type="button">
+                            <svg class="mdi" viewBox="0 0 24 24"><path d="M13 4V2l5 5-5 5V8c-3.31 0-6 2.69-6 6h2c0-2.21 1.79-4 4-4z"/></svg>
+                            Automations &amp; scenes
+                        </button>
+                        <button data-settings="areas" type="button">
+                            <svg class="mdi" viewBox="0 0 24 24"><path d="M10 4H2v8h8zm12 0h-8v8h8zM10 14H2v8h8zm12 0h-8v8h8z"/></svg>
+                            Areas, labels &amp; zones
+                        </button>
+                        <button data-settings="voice" type="button">
+                            <svg class="mdi" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11z"/></svg>
+                            Voice assistants
+                        </button>
+                        <button data-settings="dashboards" type="button">
+                            <svg class="mdi" viewBox="0 0 24 24"><path d="M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z"/></svg>
+                            Dashboards
+                        </button>
+                        <button data-settings="people" type="button">
+                            <svg class="mdi" viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm-8 0a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm8 0c-.29 0-.62.02-.97.05A5.63 5.63 0 0 1 18 17v3h6v-3c0-2.66-5.33-4-8-4z"/></svg>
+                            People
+                        </button>
+                        <button data-settings="system" type="button">
+                            <svg class="mdi" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm2 5h12v2H6zm3 5h6v2H9z"/></svg>
+                            System
+                        </button>
+                    </aside>
+                    <div class="settings-main">
+                        <header class="settings-toolbar">
+                            <div>
+                                <h2 id="settingsTitle">Devices &amp; services</h2>
+                                <p class="muted" id="settingsDescription">Manage integrations, devices, entities and repair issues.</p>
+                            </div>
+                            <input class="settings-search" id="settingsSearch" type="text" placeholder="Search integrations">
+                        </header>
+                        <div id="settingsContent"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================== NOTIFICATIONS VIEW ================== -->
+            <section class="ha-view" id="view-notifications">
+                <article class="hui-card full-card">
+                    <header><h2>Notifications</h2><small class="muted">Persistent notifications from integrations and automations</small></header>
+                    <div class="notification-list" id="notificationList"></div>
+                </article>
+            </section>
+
+        </main>
+    </section>
+</div>
+
+<!-- ============================== DIALOGS ============================== -->
+<dialog id="serviceConfigDialog" class="ha-dialog wide">
+    <form method="dialog">
+        <header>
+            <h2 id="serviceDialogTitle">Integration</h2>
+            <button type="submit" class="close-btn" aria-label="Close">×</button>
+        </header>
+        <div class="dialog-tabs">
+            <button class="active" type="button" data-dtab="config">Configuration</button>
+            <button type="button" data-dtab="services">Services</button>
+            <button type="button" data-dtab="system">System options</button>
+        </div>
+        <div id="serviceDialogBody"></div>
+    </form>
+</dialog>
+
+<dialog id="moreInfoDialog" class="ha-dialog">
+    <form method="dialog">
+        <header>
+            <h2 id="moreInfoTitle">Entity</h2>
+            <button type="submit" class="close-btn" aria-label="Close">×</button>
+        </header>
+        <div id="moreInfoBody"></div>
+    </form>
+</dialog>
+
+<div id="toastHost" class="toast-host" aria-live="polite"></div>
+
+<template id="tpl-integration-card">
+    <article class="integration-card">
+        <div class="integration-icon"></div>
+        <div class="integration-meta"><strong></strong><span></span></div>
+        <button class="ha-btn ghost" type="button" data-role="configure">Configure</button>
+    </article>
+</template>
+
+<script src="/js/ws-client.js"></script>
+<script src="/js/charts.js"></script>
+<script src="/js/mesh-map.js"></script>
+<script src="/js/zigbee-console.js"></script>
+<script src="/js/views.js"></script>
+<script src="/js/settings.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

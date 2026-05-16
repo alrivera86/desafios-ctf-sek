@@ -1,0 +1,8 @@
+TARGET APIS TO EXPLORE:
+1. /api/v2/config/* - Configuration endpoints
+2. /api/v2/services - Service calls (developer tools)
+3. MQTT integration endpoints
+4. File editor endpoints
+5. Enterprise alert bridge
+6. System audit logs
+7. Backup/restore functionality
