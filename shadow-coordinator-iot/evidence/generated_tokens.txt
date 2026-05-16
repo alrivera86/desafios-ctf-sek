@@ -1,0 +1,66 @@
+=== Shadow Coordinator Strategic Tokens ===
+Generated from Frame 307: 41883334120000aa5508000000aa551e34000106000401013318330a00001000b7b8
+Device NWK: 0x7B9C
+IEEE Address: 00:15:8d:00:02:1a:2b:3c
+Capability: 0x8e
+Sequence: 51
+Cluster: 0x0013
+
+frame_md5: 396c7daa68b865aa506fd4ae9559034d
+frame_sha256: c48544f7870fa47fe38d8fdb38741bd63584fbefe21165ec943df5869eb30683
+frame_b64: QYgzNBIAAKpVCAAAAKpVHjQAAQYABAEBMxgzCgAAEAC3uA==
+frame_16_hex: 41883334120000aa5508000000aa551e
+frame_last16_hex: 0106000401013318330a00001000b7b8
+ieee_hex: 00158d00021a2b3c
+ieee_md5: 57c55346a26d1ecaa598ab523a895c03
+ieee_sha256: 11a46415c15ede79d51bca3313e0e1929145cd707d71db150acd27d1e9e35c65
+nwk_hex: 7b9c
+nwk_padded: 00007b9c
+nwk_reversed: c9b7
+cap_seq: 8e33
+cap_seq_md5: 348fb45a017a1c826f089fcbbdb7c8cc
+cluster_hex: 0013
+cluster_padded: 00000013
+temp_ratio_int: 5cc60
+temp_ratio_md5: f87950cd3fc0f4ae4821f5790ca90b00
+seq_var_0: 33
+seq_var_1: 00000033
+seq_var_2: a29
+seq_var_3: 1c4a
+timestamp_int: 6a05d4c2
+timestamp_ms: 19e26c718c4
+timestamp_md5: ad2650731508e250def7164e7af37996
+ieee_nwk: 00158d00021a2b3c7b9c
+ieee_nwk_md5: 2aebf986acab453ec7fec07c22a0aaf1
+device_combo: 00158d00021a2b3c7b9c8e330013
+device_combo_md5: 2bc82c3e9befb55464e67d9107f4152c
+device_combo_sha256: b200c05a867c8d27b58ecc5d0b60b9cee918a7cec55c4c033ee264e46251a145
+src_addr: 55aa
+src_addr_md5: 5bc410239052771380c7b3d00148190b
+pan_id: 1234
+pan_id_md5: 81dc9bdb52d04dc20036dbd8313ed055
+frame_combo: 55aa12347b9c
+frame_combo_md5: 6301d6480ce94289bbcd4d4503d338a0
+hmac_frame_ieee: 042b98e29775c78aad7d2e2124e534671485f461ddff9547805fdee7f82bf751
+ctf_shadow7b9c: shadow7b9c
+ctf_shadow7b9c_md5: 67670e139e17b58528210c2ae741f9ba
+ctf_coordinator51: coordinator51
+ctf_coordinator51_md5: dbe43db828176e5feaa64ce66790d4ec
+ctf_lock8e33: lock8e33
+ctf_lock8e33_md5: 6b19a20555d46c194790c5fbb07c597a
+ctf_unlock00158d00: unlock00158d00
+ctf_unlock00158d00_md5: cf82c583f4b71c1d4f42539e17b61b4b
+ctf_zigbee0013: zigbee0013
+ctf_zigbee0013_md5: 2b34fa6f0b3e06a3d24ceb1a9e1d712c
+ctf_frame30755aa: frame30755aa
+ctf_frame30755aa_md5: ec5a06614293cbf1b7e247a0b2bdba58
+xor_ieee_nwk: 7b89f69c798650a0
+frame_xor_device: 419dbe34101a2b962e94
+frame_seg_0: 41883334
+frame_seg_1: 120000aa
+frame_seg_2: 55080000
+frame_seg_3: 00aa551e
+frame_seg_4: 34000106
+frame_seg_5: 00040101
+frame_seg_6: 3318330a
+frame_seg_7: 00001000

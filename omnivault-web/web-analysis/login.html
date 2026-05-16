@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniVault Financial - Portal de Clientes</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="login-body">
+    
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+    
+    <div class="login-container glass-panel">
+        <a href="/" style="position: absolute; top: 20px; right: 20px; color: var(--text-muted); text-decoration: none;"><i class="fas fa-times"></i></a>
+        
+        <div class="login-header">
+            <h2><i class="fas fa-lock" style="color: var(--primary);"></i> Acceso Privado</h2>
+            <p>Portal seguro de clientes OmniVault</p>
+        </div>
+        
+        <!-- ESTA SECCIÓN CONTIENE EL ERROR RENDERIZADO DESDE EL BACKEND (SSTI) -->
+        
+        
+        <form method="POST" action="/login" class="login-form">
+            <div class="input-group">
+                <label for="username">Usuario (RUT o Id)</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" name="username" placeholder="Ej. jperez" required autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Clave Digital</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-key"></i>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-primary btn-block">Ingresar <i class="fas fa-arrow-right"></i></button>
+        </form>
+    </div>
+</body>
+</html>

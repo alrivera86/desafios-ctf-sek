@@ -1,0 +1,1 @@
+{"pan_id":"0x1234","channel":15,"coordinator":"0x0000","permit_join":false,"started_at":"2026-05-14T15:19:14.067Z","packets_total":7395,"packets_per_second":4.2,"coordinator_firmware":"2.4.17-corp","security":{"trust_center":true,"mic_length":4,"key_rotation_days":180}}

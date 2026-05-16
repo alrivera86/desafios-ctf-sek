@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Console #1 [PelicanCI]</title>
+<style>
+:root{
+  --brand-dark:#0b1a3b;
+  --brand-blue:#0b5fff;
+  --brand-blue-h:#0047cc;
+  --brand-orange:#f46a1c;
+  --brand-orange-h:#d45a10;
+  --surface:#f4f6fb;
+  --surface-w:#ffffff;
+  --border:#dde3ef;
+  --text:#334155;
+  --text-light:#64748b;
+  --danger:#ef4444;
+  --success:#10b981;
+  --warn:#f59e0b;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Poppins","Lucida Grande",Helvetica,Arial,sans-serif;font-size:13px;background:var(--surface);color:var(--text)}
+
+/* ── Header ─────────────────────────────────────── */
+#hdr{background:var(--brand-dark);height:52px;display:flex;align-items:center;padding:0 20px;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:17px;font-weight:700;letter-spacing:.5px}
+.logo-icon{width:30px;height:30px;flex-shrink:0}
+.logo-sub{color:#9dd4f8;font-weight:400;font-size:12px;margin-left:4px}
+.hdr-r{margin-left:auto;color:#7ba3c8;font-size:11px}
+
+/* ── Breadcrumb ─────────────────────────────────── */
+#bc{background:var(--surface-w);border-bottom:1px solid var(--border);padding:7px 20px;font-size:12px;color:var(--text-light)}
+#bc a{color:var(--brand-blue);text-decoration:none}
+#bc a:hover{text-decoration:underline}
+#bc .sep{margin:0 6px;color:#c8d1e0}
+
+/* ── Layout ─────────────────────────────────────── */
+#wrap{display:flex;min-height:calc(100vh - 84px)}
+#side{width:204px;background:var(--surface-w);border-right:1px solid var(--border);padding:12px 0;flex-shrink:0}
+#main{flex:1;padding:24px 28px}
+
+/* ── Sidebar ─────────────────────────────────────── */
+.slink{display:flex;align-items:center;gap:8px;padding:8px 16px;color:var(--text);text-decoration:none;font-size:12.5px;border-left:3px solid transparent}
+.slink:hover{background:#eef2ff;color:var(--brand-blue);border-left-color:var(--brand-blue)}
+.slink.active{background:#e8f0fe;color:var(--brand-blue);border-left-color:var(--brand-blue);font-weight:600}
+.ssec{padding:10px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#aab4c8;font-weight:600}
+
+/* ── Status balls ─────────────────────────────────── */
+.ball{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle;margin-right:4px;flex-shrink:0}
+.ball-blue{background:radial-gradient(circle at 35% 35%,#4fa3f7,var(--brand-blue))}
+.ball-red{background:radial-gradient(circle at 35% 35%,#f58484,var(--danger))}
+.ball-grey{background:radial-gradient(circle at 35% 35%,#bbb,#666)}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ball-run{background:radial-gradient(circle at 35% 35%,#4fa3f7,var(--brand-blue));animation:sp 1.2s linear infinite}
+
+/* ── Page title ──────────────────────────────────── */
+h1.ph{font-size:20px;color:var(--brand-dark);font-weight:700;margin-bottom:20px;letter-spacing:-.3px}
+h2.sh{font-size:11px;color:var(--text-light);font-weight:700;margin:22px 0 10px;text-transform:uppercase;letter-spacing:.7px}
+
+/* ── Cards / tables ──────────────────────────────── */
+.card{background:var(--surface-w);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.jtable{width:100%;border-collapse:collapse}
+.jtable th{background:#f8faff;padding:9px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;color:var(--text-light);letter-spacing:.5px;font-weight:600}
+.jtable td{padding:10px 14px;border-bottom:1px solid #f0f3fb}
+.jtable tr:last-child td{border-bottom:none}
+.jtable tr:hover td{background:#f8faff}
+.jlink{color:var(--brand-blue);text-decoration:none;font-weight:600}
+.jlink:hover{text-decoration:underline}
+
+/* ── Build form ──────────────────────────────────── */
+.bform{background:var(--surface-w);border:1px solid var(--border);border-radius:8px;padding:24px;max-width:580px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.fg{margin-bottom:18px}
+.fg label{display:block;font-weight:600;margin-bottom:5px;font-size:13px;color:var(--text)}
+.fg .desc{color:var(--text-light);font-size:11px;margin-top:4px;line-height:1.5}
+.fg input[type=text]{width:100%;padding:9px 12px;border:1px solid #c8d1e0;border-radius:6px;font-size:13px;font-family:monospace;background:#fafcff;color:var(--text)}
+.fg input[type=text]:focus{border-color:var(--brand-blue);outline:none;box-shadow:0 0 0 3px rgba(11,95,255,.12);background:#fff}
+.btn-primary{background:var(--brand-blue);color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;letter-spacing:.2px;transition:background .15s}
+.btn-primary:hover{background:var(--brand-blue-h)}
+
+/* ── Alert banners ────────────────────────────────── */
+.bnr{padding:12px 16px;border-radius:6px;margin-bottom:16px;font-size:12.5px;display:flex;align-items:flex-start;gap:10px}
+.bnr-warn{background:#fffbeb;border:1px solid #fcd34d;color:#92400e}
+.bnr-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+.bnr-fail{background:#fef2f2;border:1px solid #fca5a5;color:#7f1d1d}
+.bnr-abort{background:#f8fafc;border:1px solid #cbd5e1;color:#475569}
+
+/* ── Pipeline script ─────────────────────────────── */
+.pscript{background:#0b1120;border-radius:8px;padding:20px 22px;font-family:"Courier New",Courier,monospace;font-size:12px;line-height:1.75;overflow-x:auto;white-space:pre;border:1px solid #1e2d4a}
+.k{color:#7dd3fc}.s{color:#86efac}.c{color:#475569;font-style:italic}.v{color:#fbbf24}.p{color:#c084fc}.hi{color:#f87171;background:#f8514910;border-radius:2px;padding:1px 2px}
+
+/* ── Console ─────────────────────────────────────── */
+.console{background:#060d1a;color:#a3c4f3;font-family:"Courier New",Courier,monospace;font-size:12px;padding:18px;border-radius:8px;white-space:pre-wrap;word-break:break-all;line-height:1.7;min-height:180px;max-height:68vh;overflow-y:auto;border:1px solid #1e2d4a}
+
+/* ── Stats cards ─────────────────────────────────── */
+.stats{display:flex;gap:16px;margin-bottom:22px}
+.stat-card{background:var(--surface-w);border:1px solid var(--border);border-radius:8px;padding:16px 20px;flex:1;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.stat-label{font-size:11px;text-transform:uppercase;color:var(--text-light);letter-spacing:.6px;font-weight:600;margin-bottom:4px}
+.stat-val{font-size:18px;font-weight:700;color:var(--brand-dark)}
+.stat-sub{font-size:11px;color:var(--text-light);margin-top:3px}
+
+/* ── Footer ──────────────────────────────────────── */
+#ftr{background:var(--surface-w);border-top:1px solid var(--border);padding:7px 20px;color:var(--text-light);font-size:11px;display:flex;justify-content:space-between}
+#ftr span{color:#c8d1e0}
+</style>
+</head>
+<body>
+<div id="hdr">
+  <a class="logo" href="/">
+    <svg class="logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="30" fill="#0b2a55"/>
+      <path d="M22 26c5-10 20-14 26-7 3 4 0 10-5 11 8-1 10-9 5-15C40 5 22 8 16 24z" fill="#f46a1c"/>
+      <ellipse cx="28" cy="44" rx="10" ry="12" fill="#f46a1c"/>
+      <path d="M44 32 Q54 38 50 46 Q46 52 38 46" fill="#f46a1c"/>
+      <circle cx="44" cy="28" r="3" fill="#fff" opacity=".8"/>
+    </svg>
+    PelicanCI <span class="logo-sub">/ DevOps Platform</span>
+  </a>
+  <div class="hdr-r">PelicanCorp · CI v2.4 · anonymous</div>
+</div>
+<div id="bc">
+  <a href="/">Dashboard</a><span class="sep">›</span><a href="/job/deploy-service">deploy-service</a><span class="sep">›</span><strong>#1</strong></div>
+<div id="wrap">
+  <div id="side">    <a class="slink " href="/job/deploy-service">📋 Status</a>
+  <a class="slink " href="/job/deploy-service/buildWithParameters">▶ Build with Parameters</a>
+  <div class="ssec">Build History</div>
+    <a class="slink active"
+     href="/job/deploy-service/1/console" style="font-size:12px">
+    <span class="ball ball-red"></span> #1 <span style="color:var(--text-light);font-size:11px;margin-left:auto">0.3s</span>
+  </a>
+    </div>
+  <div id="main">
+    <h1 class="ph">Console Output</h1>
+    <div class="bnr bnr-fail"><span>✗</span><span>Build <strong>#1</strong> &nbsp;·&nbsp; Service: <strong style='font-family:monospace'>webapp</strong> &nbsp;·&nbsp; 2026-05-14 14:25:38 &nbsp;·&nbsp; <strong>FAILURE</strong></span></div><div class="console">Started by user anonymous
+
+[Pipeline] { (Install)
++ rm -rf &#039;/tmp/jbuild_1&#039;
++ mkdir -p &#039;/tmp/jbuild_1&#039;
++ git -C &#039;/tmp/jbuild_1&#039; clone https://github.com/pelicancorp/webapp.git
+Cloning into &#039;webapp&#039;...
+fatal: could not read Username for &#039;https://github.com&#039;: No such device or address
+[Pipeline] }
+
+[Pipeline] { (Pre-Build)
++ sh &#039;/tmp/jbuild_1/webapp/test.sh&#039;
+sh: 0: cannot open /tmp/jbuild_1/webapp/test.sh: No such file
+[Pipeline] }
+
+[Pipeline] { (Build)
++ &#039;/tmp/jbuild_1/webapp/publish.sh&#039;
+sh: 1: /tmp/jbuild_1/webapp/publish.sh: not found
+[Pipeline] }
+
+Finished: FAILURE</div><p style="margin-top:14px;font-size:12px"><a href="/job/deploy-service" style="color:var(--brand-blue)">← Back to job</a></p>  </div>
+</div>
+<div id="ftr">
+  <span>PelicanCorp DevOps Platform v2.4.1</span>
+  <span>REST API available · <a href="/job/deploy-service/buildWithParameters" style="color:var(--brand-blue)">Build API</a></span>
+</div>
+</body>
+</html>

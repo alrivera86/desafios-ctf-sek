@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniVault Financial - Abrir Cuenta</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Menú de Navegación -->
+    <nav class="navbar glass-panel">
+        <a href="/" class="logo" style="text-decoration:none;">
+            <i class="fas fa-shield-alt" style="color: var(--primary);"></i> OmniVault Financial
+        </a>
+        <div class="nav-links">
+            <a href="/personas">Personas</a>
+            <a href="/empresas">Empresas</a>
+            <a href="/beneficios">Beneficios</a>
+            <a href="/inversiones">Inversiones</a>
+        </div>
+        <div style="display: flex; gap: 15px;">
+            <a href="/abrir_cuenta" class="btn-primary" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">Abrir Cuenta</a>
+            <a href="/login" class="btn-primary"><i class="fas fa-lock"></i> Acceso Cliente</a>
+        </div>
+    </nav>
+
+    <section class="hero" style="justify-content: center; text-align: center; margin-top: 10px;">
+        <div class="hero-content" style="max-width: 800px;">
+            <i class="fas fa-user-plus" style="font-size: 5rem; color: var(--primary); margin-bottom: 20px;"></i>
+            <h1>Únete a la Revolución Bancaria</h1>
+            <p style="font-size: 1.2rem; margin-top: 20px;">Abrir tu cuenta en OmniVault Financial toma menos de 3 minutos. Necesitarás tu Cédula de Identidad a mano.</p>
+            
+            <form action="/login" method="GET" style="display: flex; flex-direction: column; gap: 20px; align-items: center; margin-top: 40px; background: rgba(0,0,0,0.2); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color);">
+                <input type="text" placeholder="RUT completo" style="padding: 15px; width: 300px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.1); color: white;" required>
+                <input type="email" placeholder="Correo Electrónico" style="padding: 15px; width: 300px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.1); color: white;" required>
+                <button type="submit" class="btn-primary">Comenzar Proceso</button>
+            </form>
+        </div>
+    </section>
+</body>
+</html>
