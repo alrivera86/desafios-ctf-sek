@@ -5,9 +5,9 @@ from email.mime.text import MIMEText
 msg = MIMEMultipart()
 msg['Subject'] = 'CTF GitOps Chile 2026 - Resultado y Flag'
 msg['From'] = 'alrivera86@gmail.com'
-msg['To'] = 'dalcaino@bancochile.cl'
+msg['To'] = 'ariverar@bancochile.cl'
 
-body = '''Hola Daniel,
+body = '''Hola Alberto,
 
 Te comparto el resultado del desafio CTF GitOps Chile 2026.
 
