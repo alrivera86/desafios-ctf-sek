@@ -1,6 +1,8 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
 msg = MIMEMultipart()
 msg['Subject'] = 'CTF GitOps Chile 2026 - Resultado y Flag'
@@ -22,17 +24,22 @@ Parameter injection en git clone mediante:
   --config url.X.insteadOf  (URL rewriting al repo del atacante)
   --config filter.run.smudge=sh  (smudge filter RCE)
 
-El pipeline ejecutaba: git clone https://github.com/pelicancorp/SERVICE_NAME.git
-Se inyecto SERVICE_NAME con flags de git que redirigen el clone a un repo controlado
-y ejecutan sh sobre los archivos al hacer checkout, corriendo cat /flag.txt.
-
 Saludos,
 Alberto Rivera
 '''
 
 msg.attach(MIMEText(body, 'plain'))
+
+# Attach the docx file
+with open('attachment.docx', 'rb') as f:
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload(f.read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', 'attachment; filename="Prueba bines externo (1) 1.docx"')
+    msg.attach(part)
+
 with smtplib.SMTP('smtp.gmail.com', 587) as s:
     s.starttls()
     s.login('alrivera86@gmail.com', 'ojpppwgsubiikuyw')
     s.send_message(msg)
-print('Correo enviado exitosamente!')
+print('Correo con adjunto enviado exitosamente!')
