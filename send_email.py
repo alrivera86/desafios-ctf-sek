@@ -1,37 +1,45 @@
-import imaplib
-import email
-from email.header import decode_header
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
-mail = imaplib.IMAP4_SSL('imap.gmail.com')
-mail.login('alrivera86@gmail.com', 'ojpppwgsubiikuyw')
-mail.select('inbox')
+msg = MIMEMultipart()
+msg['Subject'] = 'CTF GitOps Chile 2026 - Resultado y Flag'
+msg['From'] = 'alrivera86@gmail.com'
+msg['To'] = 'ariverar@bancochile.cl'
 
-# Use SORT or just fetch by recent sequence numbers
-status, data = mail.select('inbox')
-total = int(data[0])
-print(f"Total mensajes en inbox: {total}")
+body = """Hola Alberto,
 
-# Fetch last 3 by sequence number
-for seq in range(total, total-3, -1):
-    res, msg_data = mail.fetch(str(seq), '(RFC822.HEADER)')
-    if msg_data and msg_data[0]:
-        msg = email.message_from_bytes(msg_data[0][1])
-        
-        raw_subj = msg['Subject'] or '(sin asunto)'
-        subj_parts = decode_header(raw_subj)
-        subject = ''
-        for part, enc in subj_parts:
-            if isinstance(part, bytes):
-                subject += part.decode(enc or 'utf-8', errors='replace')
-            else:
-                subject += part
-        
-        sender = msg['From'] or '?'
-        date = msg['Date'] or '?'
-        
-        print(f"\n--- Correo #{seq} ---")
-        print(f"De:     {sender[:80]}")
-        print(f"Asunto: {subject[:100]}")
-        print(f"Fecha:  {date}")
+Te comparto el resultado del desafio CTF GitOps Chile 2026.
 
-mail.logout()
+FLAG OBTENIDA:
+flag{p4r4m_1nj3ct10n_g1t_cl0n3_h00k_2024}
+
+WRITEUP COMPLETO:
+https://github.com/alrivera86/ctf-gitops-writeup
+
+TECNICA UTILIZADA:
+Parameter injection en git clone mediante:
+  --config url.X.insteadOf  (URL rewriting al repo del atacante)
+  --config filter.run.smudge=sh  (smudge filter RCE)
+
+Saludos,
+Alberto Rivera
+"""
+
+msg.attach(MIMEText(body, 'plain'))
+
+with open('attachment.docx', 'rb') as f:
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload(f.read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', 'attachment; filename="Prueba bines externo (1) 1.docx"')
+    msg.attach(part)
+
+with smtplib.SMTP('smtp.gmail.com', 587) as s:
+    s.starttls()
+    s.login('alrivera86@gmail.com', 'ojpppwgsubiikuyw')
+    s.send_message(msg)
+
+print('Correo con adjunto enviado exitosamente!')
