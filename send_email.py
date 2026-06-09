@@ -1,45 +1,28 @@
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
+import imaplib
+import email
+from email.header import decode_header
 
-msg = MIMEMultipart()
-msg['Subject'] = 'CTF GitOps Chile 2026 - Resultado y Flag'
-msg['From'] = 'alrivera86@gmail.com'
-msg['To'] = 'ariverar@bancochile.cl'
+mail = imaplib.IMAP4_SSL('imap.gmail.com')
+mail.login('alrivera86@gmail.com', 'ojpppwgsubiikuyw')
+mail.select('inbox')
 
-body = '''Hola Alberto,
+status, messages = mail.search(None, 'ALL')
+ids = messages[0].split()
+last3 = ids[-3:]
 
-Te comparto el resultado del desafio CTF GitOps Chile 2026.
+for uid in reversed(last3):
+    res, msg_data = mail.fetch(uid, '(RFC822)')
+    msg = email.message_from_bytes(msg_data[0][1])
+    
+    subj_raw, enc = decode_header(msg['Subject'])[0]
+    subject = subj_raw.decode(enc or 'utf-8') if isinstance(subj_raw, bytes) else subj_raw
+    sender = msg['From']
+    date = msg['Date']
+    
+    print(f"--- Correo #{uid.decode()} ---")
+    print(f"De:    {sender}")
+    print(f"Asunto: {subject}")
+    print(f"Fecha:  {date}")
+    print()
 
-FLAG OBTENIDA:
-flag{p4r4m_1nj3ct10n_g1t_cl0n3_h00k_2024}
-
-WRITEUP COMPLETO:
-https://github.com/alrivera86/ctf-gitops-writeup
-
-TECNICA UTILIZADA:
-Parameter injection en git clone mediante:
-  --config url.X.insteadOf  (URL rewriting al repo del atacante)
-  --config filter.run.smudge=sh  (smudge filter RCE)
-
-Saludos,
-Alberto Rivera
-'''
-
-msg.attach(MIMEText(body, 'plain'))
-
-# Attach the docx file
-with open('attachment.docx', 'rb') as f:
-    part = MIMEBase('application', 'octet-stream')
-    part.set_payload(f.read())
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', 'attachment; filename="Prueba bines externo (1) 1.docx"')
-    msg.attach(part)
-
-with smtplib.SMTP('smtp.gmail.com', 587) as s:
-    s.starttls()
-    s.login('alrivera86@gmail.com', 'ojpppwgsubiikuyw')
-    s.send_message(msg)
-print('Correo con adjunto enviado exitosamente!')
+mail.logout()
